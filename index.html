@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pick a pot</title>
+<style>
+  :root {
+    --ink: #efece4;          /* soft off-white */
+    --ink-dim: rgba(239, 236, 228, 0.62);
+    --line: rgba(239, 236, 228, 0.7);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    font-weight: 300;
+    /* Drop your image in as bg.jpg next to this file. The gradient is a fallback. */
+    background:
+      linear-gradient(rgba(0,0,0,.28), rgba(0,0,0,.28)),
+      url("bg.jpg") center / cover no-repeat,
+      radial-gradient(ellipse at 30% 20%, #2f4a28, #14210f 70%);
+    background-color: #14210f;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  main {
+    width: min(560px, calc(100vw - 48px));
+    text-align: left;
+  }
+  h1 {
+    margin: 0 0 28px;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.32em;
+    text-transform: lowercase;
+    color: var(--ink-dim);
+  }
+  input {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    outline: none;
+    padding: 10px 0 12px;
+    font: inherit;
+    font-size: 26px;
+    font-weight: 300;
+    color: var(--ink);
+    caret-color: var(--ink);
+    caret-shape: bar;
+    transition: border-color .3s;
+  }
+  input:focus { border-bottom-color: var(--ink); }
+  input::placeholder { color: transparent; }
+  .engines {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 4px;
+    margin: 30px -8px 0;
+  }
+  .engines button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    padding: 4px 8px;
+    cursor: pointer;
+    opacity: .75;
+    transition: background .18s, color .18s, opacity .18s;
+  }
+  .engines button:hover { opacity: 1; }
+  .engines button[aria-pressed="true"] {
+    background: #fff;
+    color: #000;
+    opacity: 1;
+  }
+  .engines button:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  .hint {
+    margin-top: 26px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-dim);
+    min-height: 1em;
+    transition: opacity .3s;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>pick a pot</h1>
+  <input id="q" type="text" autofocus autocomplete="off" spellcheck="false" aria-label="Search" placeholder="search">
+  <div class="engines" id="engines" role="group" aria-label="Search engines"></div>
+  <div class="hint" id="hint">press enter</div>
+</main>
+
+<script>
+const ENGINES = [
+  { name: "Google",     url: "https://www.google.com/search?q=" },
+  { name: "Ecosia",     url: "https://www.ecosia.org/search?q=" },
+  { name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
+  { name: "Perplexity", url: "https://www.perplexity.ai/search?q=" },
+];
+
+const q = document.getElementById("q");
+const box = document.getElementById("engines");
+const hint = document.getElementById("hint");
+
+let selected;
+try { selected = new Set(JSON.parse(localStorage.getItem("pickapot") || "null") || [ENGINES[0].name]); }
+catch { selected = new Set([ENGINES[0].name]); }
+
+const save = () => { try { localStorage.setItem("pickapot", JSON.stringify([...selected])); } catch {} };
+
+ENGINES.forEach(e => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = e.name;
+  b.setAttribute("aria-pressed", selected.has(e.name));
+  b.addEventListener("click", () => {
+    selected.has(e.name) ? selected.delete(e.name) : selected.add(e.name);
+    b.setAttribute("aria-pressed", selected.has(e.name));
+    save();
+    hint.textContent = "press enter";
+    q.focus();
+  });
+  box.appendChild(b);
+});
+
+function go() {
+  const term = q.value.trim();
+  if (!term) return;
+  const picks = ENGINES.filter(e => selected.has(e.name));
+  if (!picks.length) { hint.textContent = "choose a search engine"; return; }
+  picks.forEach(e => window.open(e.url + encodeURIComponent(term), "_blank"));
+}
+
+q.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+document.addEventListener("click", e => { if (!e.target.closest("button")) q.focus(); });
+</script>
+</body>
+</html>
