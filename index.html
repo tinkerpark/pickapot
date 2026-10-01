@@ -51,8 +51,12 @@
     color: var(--ink);
   }
   .tagline {
-    margin: 14px 0 0;
-    font-size: 11px;
+    position: absolute;
+    top: calc(8vh + 5px);
+    left: 6vw;
+    margin: 0;
+    white-space: nowrap;
+    font-size: 12px;
     font-weight: 300;
     letter-spacing: 0.12em;
     line-height: 1.7;
@@ -61,7 +65,7 @@
   .row {
     display: flex;
     align-items: flex-end;
-    gap: 18px;
+    gap: 28px;
   }
   .row input { flex: none; width: 60%; min-width: 0; }
   #go {
@@ -80,7 +84,6 @@
     color: var(--ink);
     cursor: pointer;
     opacity: .75;
-    margin-left: auto;
     transition: opacity .2s;
   }
   #go:hover { opacity: 1; }
@@ -158,8 +161,8 @@
 </style>
 </head>
 <body>
-<header class="brand"><h1>pick<br>a pot</h1>
-  <p class="tagline">ask once, pick your answers.</p></header>
+<header class="brand"><h1>pick<br>a pot</h1></header>
+<p class="tagline">Ask once, find many.</p>
 <main>
   <div class="row">
     <input id="q" type="text" autofocus autocomplete="off" spellcheck="false" aria-label="Search" placeholder="search">
