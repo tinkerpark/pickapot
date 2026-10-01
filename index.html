@@ -50,12 +50,20 @@
     line-height: 1.6;
     color: var(--ink);
   }
+  .tagline {
+    margin: 14px 0 0;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
   .row {
     display: flex;
     align-items: flex-end;
     gap: 18px;
   }
-  .row input { flex: 1; min-width: 0; }
+  .row input { flex: none; width: 60%; min-width: 0; }
   #go {
     appearance: none;
     border: 0;
@@ -71,9 +79,11 @@
     text-transform: uppercase;
     color: var(--ink);
     cursor: pointer;
+    opacity: .75;
+    margin-left: auto;
     transition: opacity .2s;
   }
-  #go:hover { opacity: .65; }
+  #go:hover { opacity: 1; }
   #go:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
   input {
     display: block;
@@ -148,7 +158,8 @@
 </style>
 </head>
 <body>
-<header class="brand"><h1>pick<br>a pot</h1></header>
+<header class="brand"><h1>pick<br>a pot</h1>
+  <p class="tagline">ask once, pick your answers.</p></header>
 <main>
   <div class="row">
     <input id="q" type="text" autofocus autocomplete="off" spellcheck="false" aria-label="Search" placeholder="search">
@@ -214,6 +225,15 @@ function go() {
     hint.textContent = "";
   }
 }
+
+function fitLine() {
+  const last = box.lastElementChild.getBoundingClientRect().right;
+  const left = q.getBoundingClientRect().left;
+  q.style.width = Math.max(120, last - left + 40) + "px";
+}
+fitLine();
+document.fonts && document.fonts.ready.then(fitLine);
+window.addEventListener("resize", fitLine);
 
 document.getElementById("go").addEventListener("click", go);
 q.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
