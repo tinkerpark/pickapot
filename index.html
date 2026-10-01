@@ -84,6 +84,7 @@
     opacity: 1;
   }
   .engines button:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  .hint a { color: var(--ink); text-underline-offset: 3px; }
   .hint {
     margin-top: 26px;
     font-size: 12px;
@@ -140,7 +141,22 @@ function go() {
   if (!term) return;
   const picks = ENGINES.filter(e => selected.has(e.name));
   if (!picks.length) { hint.textContent = "choose a search engine"; return; }
-  picks.forEach(e => window.open(e.url + encodeURIComponent(term), "_blank"));
+  const blocked = picks.filter(e => !window.open(e.url + encodeURIComponent(term), "_blank"));
+  hint.textContent = "";
+  if (blocked.length) {
+    hint.append("your browser blocked: ");
+    blocked.forEach((e, i) => {
+      const a = document.createElement("a");
+      a.href = e.url + encodeURIComponent(term);
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = e.name;
+      hint.append(i ? ", " : "", a);
+    });
+    hint.append(" — allow popups for this page to open all at once");
+  } else {
+    hint.textContent = "press enter";
+  }
 }
 
 q.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
